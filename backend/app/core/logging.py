@@ -17,6 +17,11 @@ from app.core.config import settings
 
 def configure_logging() -> None:
     """Configure stdlib logging and structlog processors."""
+    # Force UTF-8 encoding for standard output to prevent 'charmap' codec errors on Windows
+    # when logging non-ASCII text (e.g. Hindi/Bengali/Odia characters from LLM outputs).
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+
     logging.basicConfig(
         format="%(message)s",
         stream=sys.stdout,
