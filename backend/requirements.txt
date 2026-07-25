@@ -1,0 +1,16 @@
+# Core
+fastapi>=0.115,<0.116
+uvicorn[standard]>=0.32,<0.33
+pydantic>=2.9,<3
+pydantic-settings>=2.5,<3
+
+# CivicAI specific
+pymupdf>=1.24,<2
+pdf2image>=1.17,<2
+pytesseract>=0.3.10,<1
+Pillow>=10.2,<11
+python-multipart>=0.0.9,<1
+httpx>=0.27,<1
+
+# Observability
+structlog>=24.4,<25
