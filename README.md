@@ -1,60 +1,141 @@
-# CivicAI
+<div align="center">
 
-An AI-powered public service assistant that helps citizens understand official documents, check eligibility, and get personalized action plans in multiple languages.
+# 🏛️ CivicAI
 
-Powered by a React frontend, FastAPI backend, and a locally running Gemma 4 model via Ollama.
+**An AI-powered public service assistant bridging the gap between citizens and government.**
 
-## Architecture
+[![React](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-blue?style=for-the-badge&logo=react)](https://react.dev/)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Gemini](https://img.shields.io/badge/AI-Google_Gemini-FFA700?style=for-the-badge)](https://deepmind.google/technologies/gemini/)
+[![Ollama](https://img.shields.io/badge/AI-Local_Gemma_4-white?style=for-the-badge)](https://ollama.com/)
 
-- **Frontend**: React, Vite, Framer Motion
-- **Backend**: FastAPI, PyMuPDF, pytesseract
-- **LLM Engine**: Dual providers supported (Local Ollama `gemma4:latest` OR Gemini API)
+*CivicAI helps citizens understand dense official documents, check their eligibility for government programs, and get personalized, step-by-step action plans in their native language.*
 
-## Prerequisites
+</div>
 
-1. **Node.js** (for the Vite frontend)
-2. **Python 3.10+** (for the FastAPI backend)
-3. **Ollama** running locally with Gemma 4:
+---
+
+## ✨ Features
+
+- **📄 Document Analysis**: Upload any official PDFs or scanned images. Our pipeline handles parsing and OCR automatically.
+- **🧠 Dual AI Engine Architecture**: 
+  - ☁️ **Google Gemini API**: Blazing fast, cloud-hosted intelligence.
+  - 🔒 **Local Gemma 4 (Ollama)**: 100% private, on-device inference for sensitive documents.
+- **🗣️ Multilingual Support**: Break language barriers. Supports English, Hindi, Bengali, Odia, and more.
+- **✅ Eligibility & Checklists**: Automatically extracts eligibility status and generates an actionable checklist.
+- **⚠️ Missing Document Detection**: Immediately flags any missing supporting documents required for your application.
+- **💬 Voice-Enabled Follow-up Chat**: Ask questions about your document in context, using either text or your voice!
+
+---
+
+## 🏗️ Architecture
+
+CivicAI is built with a modern, decoupled stack to ensure maximum performance and flexibility:
+
+- **Frontend**: React, Vite, Framer Motion (for buttery-smooth micro-interactions)
+- **Backend**: FastAPI, PyMuPDF, pytesseract (Robust OCR fallback)
+- **LLM Engine**: Dual Provider System (Ollama `gemma4:latest` OR Google Gemini API)
+
+---
+
+## 🚀 Getting Started
+
+Follow these steps to get CivicAI running on your local machine.
+
+### 1. Prerequisites
+
+Before you begin, ensure you have the following installed:
+- **Node.js** (v18 or higher)
+- **Python** (v3.10 or higher)
+- **Tesseract OCR** (System dependency for image parsing. Must be in your system `PATH`)
+- **Poppler** (System dependency for PDF-to-image fallback. e.g., `brew install poppler` on macOS or via binaries on Windows)
+
+### 2. Setup the AI Engine (Choose One or Both)
+
+CivicAI gives you the flexibility to use a cloud provider or run entirely locally!
+
+**Option A: Local Privacy (Ollama + Gemma 4)**
+If you want to run the model locally on your own hardware:
+1. Install [Ollama](https://ollama.com/).
+2. Open your terminal and pull the Gemma model:
    ```bash
    ollama pull gemma4:latest
    ollama run gemma4:latest
    ```
-4. **System Dependencies** (for OCR fallback):
-   - **Tesseract OCR**: Needs to be installed and available in your PATH.
-   - **Poppler**: Needed for converting scanned PDFs to images (e.g., via `brew install poppler` on macOS or downloading Windows binaries).
-5. **Environment Configuration**:
-   - Copy `.env.example` to `.env` in the `backend/` directory.
-   - Add your `GEMINI_API_KEY` to the `.env` file if you wish to use the Gemini cloud provider instead of local Ollama. The app functions entirely locally without it.
+   *(Keep Ollama running in the background)*
 
-## Running the Application Locally
+**Option B: Cloud Speed (Google Gemini API)**
+If you prefer the speed and power of Gemini:
+1. Navigate to the `backend/` directory.
+2. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+3. Open `.env` and add your Gemini API Key:
+   ```env
+   GEMINI_API_KEY=your_actual_api_key_here
+   ```
 
-### 1. Start the Backend
+---
 
-Navigate to the `backend/` directory, install requirements, and start Uvicorn:
+### 3. Run the Backend
 
-```bash
-cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-```
+The FastAPI backend handles document parsing, OCR, and AI routing.
 
-### 2. Start the Frontend
+1. Open a new terminal and navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+2. Create and activate a Python virtual environment (recommended):
+   ```bash
+   python -m venv .venv
+   
+   # On Windows:
+   .\.venv\Scripts\activate
+   # On macOS/Linux:
+   source .venv/bin/activate
+   ```
+3. Install the required Python packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. Start the Uvicorn development server:
+   ```bash
+   uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+   ```
 
-In a separate terminal, navigate to the `frontend/` directory, install NPM packages, and start Vite:
+---
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+### 4. Run the Frontend
 
-The frontend will be available at `http://localhost:5173`. API requests are automatically proxied to the backend at port 8000.
+The React frontend provides the modern, animated user interface.
 
-## Features
+1. Open a **second** terminal and navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+2. Install the Node modules:
+   ```bash
+   npm install
+   ```
+3. Start the Vite development server:
+   ```bash
+   npm run dev
+   ```
+4. Open your browser and navigate to: **`http://localhost:5173`**
 
-- **Document Analysis**: Upload official PDFs or scanned images.
-- **Plain Language Explanations**: Uses Gemma 4 to explain the document simply.
-- **Multilingual Support**: Supports English, Hindi, Bengali, Odia, etc.
-- **Eligibility & Checklists**: Automatically extracts eligibility status and a checklist of required actions.
-- **Missing Document Detection**: Identifies and flags missing supporting documents.
-- **Follow-up Chat**: Ask questions about your document in context.
+*(Note: API requests from the frontend are automatically proxied to the backend running on port 8000).*
+
+---
+
+## 🛠️ Usage
+
+1. **Upload**: Drag and drop a government PDF or image into the upload zone.
+2. **Select Preferences**: Choose your preferred Language and toggle between the **Local Gemma** or **Gemini API** provider.
+3. **Analyze**: Click "Analyze Document". The system will parse the text (falling back to OCR if needed) and generate a plain-language summary, eligibility check, and action plan.
+4. **Chat**: Use the chat panel on the right to ask follow-up questions about your specific document. Click the microphone icon to ask using your voice!
+
+---
+<div align="center">
+  <i>Built with ❤️ for Civic Innovation.</i>
+</div>
