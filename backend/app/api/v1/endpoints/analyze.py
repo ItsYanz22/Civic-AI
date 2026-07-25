@@ -71,7 +71,10 @@ async def analyze_document(
         raise he
     except Exception as e:
         logger.error(f"JSON generation failed: {e}")
-        raise HTTPException(status_code=500, detail="Failed to analyze document with AI.")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Failed to analyze document with {provider} AI: {str(e)}"
+        )
         
     # 5. Create session
     session_id = str(uuid.uuid4())
