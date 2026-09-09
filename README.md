@@ -11,6 +11,8 @@
 
 *CivicAI helps citizens understand dense official documents, check their eligibility for government programs, and get personalized, step-by-step action plans in their native language.*
 
+**This Project was done by Team Code_Crafters, as their Hackathon Submission for MLH HackDays, hosted by Major League Hacking and GDG on Campus Techno Mains Salt Lake.**
+
 </div>
 
 ---
@@ -35,6 +37,11 @@ CivicAI is built with a modern, decoupled stack to ensure maximum performance an
 - **Frontend**: React, Vite, Framer Motion (for buttery-smooth micro-interactions)
 - **Backend**: FastAPI, PyMuPDF, pytesseract (Robust OCR fallback)
 - **LLM Engine**: Dual Provider System (Ollama `gemma4:latest` OR Google Gemini API)
+
+### 🔗 Integrations
+
+- **☁️ Cloudinary**: Used for secure and robust document hosting. When users upload official PDFs or images for analysis, CivicAI uploads them to Cloudinary to generate a persistent URL. This enables the frontend to display the original document side-by-side with the AI-generated explanations and checklists, providing essential context.
+- **❄️ Snowflake**: Acts as our highly scalable data warehouse. CivicAI uses Snowflake to securely log user analysis sessions, query histories, and eligibility outcomes. This persistent storage allows for analytics on civic engagement, tracking which schemes are most frequently queried, and identifying common document friction points without slowing down the core user experience.
 
 ---
 
