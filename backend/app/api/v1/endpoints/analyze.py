@@ -1,5 +1,5 @@
 import uuid
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, BackgroundTasks
 from app.services.document_parser import parse_document
 from app.core.state import session_store
 from app.core.logging import get_logger
@@ -12,6 +12,7 @@ MAX_FILE_SIZE = 10 * 1024 * 1024 # 10MB
 
 from app.services.ollama_provider import OllamaProvider
 from app.services.gemini_provider import GeminiProvider
+from app.services.snowflake_service import log_analysis_session
 
 def get_provider(provider_name: str):
     if provider_name == "gemini":
@@ -20,10 +21,13 @@ def get_provider(provider_name: str):
 
 @router.post("")
 async def analyze_document(
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     language: str = Form("English"),
     provider: str = Form("gemma-local")
 ):
+    session_id = str(uuid.uuid4())
+    
     # 1. Validate file size (approximation by checking content length if available, or reading chunks)
     # Read the file to memory (we need it for parsing anyway)
     content = await file.read()
@@ -77,11 +81,20 @@ async def analyze_document(
         )
         
     # 5. Create session
-    session_id = str(uuid.uuid4())
     session_store[session_id] = [
         {"role": "user", "content": prompt},
         {"role": "assistant", "content": str(result)} # store the raw stringified JSON for context
     ]
+    
+    # Snowflake Integration: Log the session
+    background_tasks.add_task(
+        log_analysis_session, 
+        session_id, 
+        file.filename, 
+        language, 
+        provider, 
+        result
+    )
     
     # 6. Return exact expected schema + session_id
     result["session_id"] = session_id

@@ -43,6 +43,26 @@ class Settings(BaseSettings):
             return []
         return [o.strip() for o in self.BACKEND_CORS_ORIGINS.split(",") if o.strip()]
 
+    # --- Snowflake Settings -----------------------------------------------
+    SNOWFLAKE_ACCOUNT: str = ""
+    SNOWFLAKE_USER: str = ""
+    SNOWFLAKE_PASSWORD: str = ""
+    SNOWFLAKE_WAREHOUSE: str = ""
+    SNOWFLAKE_DATABASE: str = ""
+    SNOWFLAKE_SCHEMA: str = ""
+    SNOWFLAKE_ROLE: str = ""
+
+    @property
+    def snowflake_configured(self) -> bool:
+        return bool(
+            self.SNOWFLAKE_ACCOUNT and 
+            self.SNOWFLAKE_USER and 
+            self.SNOWFLAKE_PASSWORD and 
+            self.SNOWFLAKE_WAREHOUSE and 
+            self.SNOWFLAKE_DATABASE and 
+            self.SNOWFLAKE_SCHEMA
+        )
+
     @property
     def is_production(self) -> bool:
         return self.ENVIRONMENT == "production"

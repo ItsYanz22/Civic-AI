@@ -148,3 +148,20 @@ Build with Gemma Hackathon Team
 ## 📄 License
 
 This project is developed for the **Build with Gemma Hackathon** and is intended for educational and research purposes.
+## Integrations (Optional)
+
+### Snowflake (Analytics Logging)
+To log analysis sessions and chat messages to a data warehouse:
+1. Sign up for a [Snowflake account](https://www.snowflake.com/).
+2. Run the DDL script in \scripts/snowflake_schema.sql\ to create the tables.
+3. Add credentials to your .env:
+   `env
+   SNOWFLAKE_ACCOUNT=your_account
+   SNOWFLAKE_USER=your_user
+   SNOWFLAKE_PASSWORD=your_password
+   SNOWFLAKE_WAREHOUSE=your_warehouse
+   SNOWFLAKE_DATABASE=your_database
+   SNOWFLAKE_SCHEMA=your_schema
+   SNOWFLAKE_ROLE=your_role
+   ``n
+**Fail-Soft Design:** The Snowflake integration is entirely optional and uses fire-and-forget logic. If credentials are missing or the services are down, CivicAI logs a warning and continues functioning normally without blocking or delaying the user experience.

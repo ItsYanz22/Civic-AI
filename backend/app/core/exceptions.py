@@ -90,6 +90,8 @@ def register_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(StarletteHTTPException)
     async def _http_exception_handler(_request: Request, exc: StarletteHTTPException) -> JSONResponse:
+        if exc.status_code == 500:
+            logger.exception('HTTP 500 Traceback', error=str(exc))
         return JSONResponse(
             status_code=exc.status_code,
             content=_error_body("http_error", str(exc.detail)),
