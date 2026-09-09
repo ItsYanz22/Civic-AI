@@ -42,4 +42,4 @@ async def test_analyze_empty_file_rejected(client: AsyncClient):
         data = {"language": "English", "provider": "gemini"}
         resp = await client.post("/api/v1/analyze", files=files, data=data)
         assert resp.status_code == 400
-        assert "readable text" in resp.json().get("detail", "").lower()
+        assert "readable text" in resp.json().get("error", {}).get("message", "").lower()
