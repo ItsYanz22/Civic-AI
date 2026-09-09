@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ChatPanel from './ChatPanel.jsx'
 import './DemoPanel.css'
@@ -19,13 +19,41 @@ const itemVariants = {
 export default function DemoPanel() {
   const [file, setFile] = useState(null)
   const [language, setLanguage] = useState('English')
-  const [provider, setProvider] = useState('gemma-local')
+  const [provider, setProvider] = useState('gemini')
   const [status, setStatus] = useState('idle') // idle | reading | done | error
   const [errorMsg, setErrorMsg] = useState('')
   const [docResult, setDocResult] = useState(null)
   const [dragActive, setDragActive] = useState(false)
+  const [samples, setSamples] = useState([])
+  const [activeSampleId, setActiveSampleId] = useState(null)
+  const [loadingSample, setLoadingSample] = useState(false)
   
   const fileInputRef = useRef(null)
+
+  useEffect(() => {
+    fetch('/api/v1/samples')
+      .then(res => res.ok ? res.json() : [])
+      .then(data => setSamples(data))
+      .catch(err => console.warn('Could not load sample list:', err))
+  }, [])
+
+  const handleSelectSample = async (sample) => {
+    try {
+      setActiveSampleId(sample.id)
+      setLoadingSample(true)
+      const res = await fetch(`/api/v1/samples/${sample.id}/download`)
+      if (!res.ok) throw new Error('Failed to load sample document')
+      const blob = await res.blob()
+      const sampleFile = new File([blob], sample.filename, { type: 'application/pdf' })
+      setFile(sampleFile)
+      setErrorMsg('')
+    } catch (err) {
+      console.error(err)
+      setErrorMsg('Failed to load sample document')
+    } finally {
+      setLoadingSample(false)
+    }
+  }
 
   const handleDrag = (e) => {
     e.preventDefault()
@@ -110,6 +138,38 @@ export default function DemoPanel() {
                 {provider === 'gemma-local' ? 'Private & offline, but may be slower.' : 'Requires internet and API key. Sends data to Google.'}
               </span>
             </div>
+
+            {samples.length > 0 && (
+              <div className="sample-presets-bar" style={{ marginBottom: '1.25rem' }}>
+                <span className="toggle-label" style={{ display: 'block', marginBottom: '8px', fontSize: '13px', color: '#94a3b8' }}>
+                  Quick Demo Pre-sets (1-Click Sample Schemes):
+                </span>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {samples.map((s) => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      className={`sample-pill-btn ${activeSampleId === s.id ? 'active' : ''}`}
+                      onClick={() => handleSelectSample(s)}
+                      disabled={loadingSample || status === 'reading'}
+                      style={{
+                        padding: '7px 14px',
+                        borderRadius: '20px',
+                        fontSize: '13px',
+                        cursor: 'pointer',
+                        border: activeSampleId === s.id ? '1px solid var(--saffron-500)' : '1px solid rgba(255,255,255,0.18)',
+                        background: activeSampleId === s.id ? 'rgba(226, 147, 46, 0.18)' : 'rgba(255,255,255,0.06)',
+                        color: activeSampleId === s.id ? 'var(--saffron-500)' : '#e2e8f0',
+                        fontWeight: activeSampleId === s.id ? 600 : 400,
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      🏛️ {s.title}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="controls-row">
               <div 
