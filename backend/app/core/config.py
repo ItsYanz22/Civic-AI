@@ -25,9 +25,9 @@ class Settings(BaseSettings):
     )
 
     # --- Project metadata -------------------------------------------------
-    PROJECT_NAME: str = "Procura API"
-    DESCRIPTION: str = "Plain FastAPI backend."
-    VERSION: str = "0.1.0"
+    PROJECT_NAME: str = "CivicAI API"
+    DESCRIPTION: str = "CivicAI: Your AI Public Service Officer API."
+    VERSION: str = "1.0.0"
     API_V1_PREFIX: str = "/api/v1"
 
     # --- Runtime ----------------------------------------------------------
@@ -43,6 +43,10 @@ class Settings(BaseSettings):
     # --- AI Providers -----------------------------------------------------
     GEMINI_API_KEY: str = ""
 
+    @property
+    def gemini_configured(self) -> bool:
+        return bool(self.GEMINI_API_KEY.strip())
+
     # --- Cloudinary (original document storage) ---------------------------
     CLOUDINARY_CLOUD_NAME: str = ""
     CLOUDINARY_API_KEY: str = ""
@@ -54,6 +58,26 @@ class Settings(BaseSettings):
             self.CLOUDINARY_CLOUD_NAME.strip()
             and self.CLOUDINARY_API_KEY.strip()
             and self.CLOUDINARY_API_SECRET.strip()
+        )
+
+    # --- Snowflake Settings (persistent analytics/session logging) --------
+    SNOWFLAKE_ACCOUNT: str = ""
+    SNOWFLAKE_USER: str = ""
+    SNOWFLAKE_PASSWORD: str = ""
+    SNOWFLAKE_WAREHOUSE: str = ""
+    SNOWFLAKE_DATABASE: str = ""
+    SNOWFLAKE_SCHEMA: str = ""
+    SNOWFLAKE_ROLE: str = ""
+
+    @property
+    def snowflake_configured(self) -> bool:
+        return bool(
+            self.SNOWFLAKE_ACCOUNT.strip()
+            and self.SNOWFLAKE_USER.strip()
+            and self.SNOWFLAKE_PASSWORD.strip()
+            and self.SNOWFLAKE_WAREHOUSE.strip()
+            and self.SNOWFLAKE_DATABASE.strip()
+            and self.SNOWFLAKE_SCHEMA.strip()
         )
 
     @property

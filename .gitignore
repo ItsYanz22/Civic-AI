@@ -14,6 +14,15 @@ venv/
 # Environment
 .env
 
+# Testing & Caches
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+test_*.png
+test_*.pdf
+
 # OS
 .DS_Store
 Thumbs.db
+

@@ -15,3 +15,16 @@ class AIProvider(ABC):
         Processes a chat message given context history.
         """
         pass
+
+
+def get_provider(provider_name: str) -> AIProvider:
+    """Factory function to resolve the requested AI provider."""
+    normalized = (provider_name or "").lower().strip()
+    if normalized in ("gemini", "google-gemini", "gemini-api"):
+        from app.services.gemini_provider import GeminiProvider
+        return GeminiProvider()
+    
+    # Default to local Ollama (Gemma)
+    from app.services.ollama_provider import OllamaProvider
+    return OllamaProvider()
+

@@ -19,7 +19,7 @@ class GeminiProvider(AIProvider):
         if not self.api_key:
             raise HTTPException(
                 status_code=400, 
-                detail="Gemini API Key is missing. Please set GEMINI_API_KEY environment variable to use the Gemini provider."
+                detail="Gemini API Key is missing. Please set GEMINI_API_KEY in .env to use the Gemini provider."
             )
             
     async def generate_json(self, prompt: str) -> Dict[str, Any]:
@@ -45,8 +45,14 @@ class GeminiProvider(AIProvider):
                 res.raise_for_status()
                 data = res.json()
                 
-                # Extract text
-                result_text = data["candidates"][0]["content"]["parts"][0]["text"]
+                # Extract text across all parts (handles thinking parts or split text)
+                candidates = data.get("candidates", [])
+                if not candidates:
+                    raise ValueError("No candidates returned by Gemini API.")
+                parts = candidates[0].get("content", {}).get("parts", [])
+                result_text = "".join(p.get("text", "") for p in parts if p.get("text"))
+                if not result_text:
+                    raise ValueError("Empty response text from Gemini API.")
                 
                 # Attempt to parse and validate
                 parsed = _repair_and_parse_json(result_text)
@@ -54,17 +60,22 @@ class GeminiProvider(AIProvider):
                 return parsed
             except Exception as e:
                 logger.error(f"Gemini API JSON generation failed: {e}")
+                err_detail = "Failed to generate valid response from Gemini API."
                 if hasattr(e, 'response') and e.response:
-                    logger.error(f"Response: {e.response.text}")
-                raise HTTPException(status_code=500, detail="Failed to generate valid response from Gemini API.")
+                    try:
+                        err_json = e.response.json()
+                        err_detail = err_json.get("error", {}).get("message", err_detail)
+                    except Exception:
+                        pass
+                raise HTTPException(status_code=500, detail=err_detail)
 
     async def chat(self, history: List[Dict[str, str]], new_message: str) -> str:
         # Convert history format
         contents = []
         for msg in history:
             role = "user" if msg["role"] == "user" else "model"
-            # Gemini only takes user or model, not system. For simplicity, just append all text if role is system (or ignore).
-            if msg["role"] == "system": continue
+            if msg["role"] == "system":
+                continue
             contents.append({
                 "role": role,
                 "parts": [{"text": msg["content"]}]
@@ -82,7 +93,19 @@ class GeminiProvider(AIProvider):
                 res = await client.post(f"{GEMINI_API_URL}?key={self.api_key}", json=payload)
                 res.raise_for_status()
                 data = res.json()
-                return data["candidates"][0]["content"]["parts"][0]["text"]
+                candidates = data.get("candidates", [])
+                if not candidates:
+                    raise ValueError("No candidates returned by Gemini API.")
+                parts = candidates[0].get("content", {}).get("parts", [])
+                reply = "".join(p.get("text", "") for p in parts if p.get("text"))
+                return reply
             except Exception as e:
                 logger.error(f"Gemini API chat failed: {e}")
-                raise HTTPException(status_code=500, detail="Failed to get chat response from Gemini API.")
+                err_detail = "Failed to get chat response from Gemini API."
+                if hasattr(e, 'response') and e.response:
+                    try:
+                        err_json = e.response.json()
+                        err_detail = err_json.get("error", {}).get("message", err_detail)
+                    except Exception:
+                        pass
+                raise HTTPException(status_code=500, detail=err_detail)

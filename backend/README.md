@@ -148,3 +148,29 @@ Build with Gemma Hackathon Team
 ## 📄 License
 
 This project is developed for the **Build with Gemma Hackathon** and is intended for educational and research purposes.
+
+---
+
+## 🔌 Integrations (Optional)
+
+### ☁️ Cloudinary (Persistent Document Storage)
+CivicAI can upload and store user-submitted PDFs and images safely in Cloudinary:
+1. Set `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET` in `.env`.
+2. When documents are analyzed, CivicAI uploads them to `civicai/{session_id}/` and returns a secure viewing URL.
+3. If unconfigured, the app falls back silently with in-memory session processing.
+
+### ❄️ Snowflake (Analytics & Warehouse Logging)
+To log analysis sessions and chat exchanges for reporting and compliance:
+1. Run the DDL script in `backend/scripts/snowflake_schema.sql` to initialize tables.
+2. Add your Snowflake credentials to `.env`:
+   ```env
+   SNOWFLAKE_ACCOUNT=your_account
+   SNOWFLAKE_USER=your_user
+   SNOWFLAKE_PASSWORD=your_password
+   SNOWFLAKE_WAREHOUSE=your_warehouse
+   SNOWFLAKE_DATABASE=your_database
+   SNOWFLAKE_SCHEMA=your_schema
+   SNOWFLAKE_ROLE=your_role
+   ```
+**Fail-Soft Design:** The Snowflake integration is non-blocking and fire-and-forget. If credentials are missing or the warehouse is unreachable, CivicAI logs a warning and proceeds without interruption.
+
