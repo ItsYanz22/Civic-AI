@@ -16,6 +16,40 @@ const itemVariants = {
   show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
 }
 
+const ChecklistItem = ({ item, isMissing }) => {
+  const [checked, setChecked] = useState(false);
+
+  return (
+    <li style={{ display: 'flex', flexDirection: 'column', gap: '4px', cursor: 'pointer', userSelect: 'none' }} onClick={() => setChecked(!checked)}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+        <div style={{ position: 'relative', marginTop: '2px', flex: 'none', width: '15px', height: '15px' }}>
+          <span className="checklist-box" aria-hidden="true" style={{ 
+            borderColor: isMissing ? (checked ? '#16a34a' : '#ef4444') : (checked ? '#16a34a' : ''),
+            background: checked ? '#16a34a' : 'transparent',
+            display: 'inline-block',
+            margin: 0,
+            width: '100%',
+            height: '100%'
+          }} />
+          {checked && (
+            <svg style={{ position: 'absolute', top: 1, left: 2, pointerEvents: 'none' }} width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          )}
+        </div>
+        <span style={{ color: isMissing ? (checked ? 'inherit' : '#991b1b') : 'inherit', textDecoration: checked ? 'line-through' : 'none', opacity: checked ? 0.6 : 1 }}>{item}</span>
+      </div>
+      <div style={{ marginLeft: '25px', fontSize: '13px', fontWeight: '600', marginTop: '2px' }}>
+        {checked ? (
+          <span style={{ color: '#16a34a' }}>Fulfilled</span>
+        ) : (
+          <span style={{ color: '#ef4444' }}>Not Fulfilled</span>
+        )}
+      </div>
+    </li>
+  );
+};
+
 export default function DemoPanel() {
   const [file, setFile] = useState(null)
   const [language, setLanguage] = useState('English')
@@ -268,10 +302,7 @@ export default function DemoPanel() {
                       <span className="result-label">Your checklist</span>
                       <ul className="checklist">
                         {docResult.checklist.map((item, idx) => (
-                          <li key={idx}>
-                            <span className="checklist-box" aria-hidden="true" />
-                            {item}
-                          </li>
+                          <ChecklistItem key={idx} item={item} isMissing={false} />
                         ))}
                       </ul>
                     </motion.div>
@@ -281,10 +312,7 @@ export default function DemoPanel() {
                         <span className="result-label" style={{ color: '#ef4444' }}>Missing Documents</span>
                         <ul className="checklist">
                           {docResult.missing_documents.map((item, idx) => (
-                            <li key={idx} style={{ color: '#991b1b' }}>
-                              <span className="checklist-box" aria-hidden="true" style={{ borderColor: '#ef4444' }} />
-                              {item}
-                            </li>
+                            <ChecklistItem key={idx} item={item} isMissing={true} />
                           ))}
                         </ul>
                       </motion.div>
